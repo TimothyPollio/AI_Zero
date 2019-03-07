@@ -3,8 +3,9 @@ import numpy as np
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 from constants import *
+from Core.network import file_path, save_model, load_model
 from Core.player import NetworkPlayer
-from Core.record import combine_records
+from Core.record import combine_records, load_record
 from Core.self_play import MultipleSelfPlay
 
 if REFERENCE_AVAILABLE:
@@ -22,15 +23,17 @@ def self_play():
     print("Game record now has size", len(game_record))
 
 def train():
-    global game_record
     for n in range(min(BATCHES_PER_CYCLE,
                        int(len(game_record) * MAX_EPOCHS_PER_CYCLE / BATCH_SIZE))):
         player.train(*game_record.batch())
         if VERBOSE_TRAINING and n > 1 and n % 100 == 0:
             print("TRAINING ON BATCH", n)
 
+def save_state():
+    game_record.save(file_path('record.npz'))
+    save_model()
+
 def print_metrics(step):
-    global game_record
     metrics = player.metrics(*game_record.batch())
     print("Step {} Loss: {:.3f} Policy Loss: {:.3f} Value Loss: {:.3f} Value Accuracy: {:.1f}%"\
                  .format(*((step,) + tuple(metrics))))
@@ -41,10 +44,15 @@ def print_metrics(step):
 
 if __name__ == '__main__':
 
-    print("Generating record...")
-    self_play()
-    while len(game_record) < MIN_RECORD_SIZE:
+    if WARM_START:
+        game_record = load_record(file_path('record.npz'))
+        load_model()
+    else:
+        print("Generating record...")
         self_play()
+        while len(game_record) < MIN_RECORD_SIZE:
+            self_play()
+        save_state()
 
     print("Training...")
     step = 0
@@ -53,4 +61,6 @@ if __name__ == '__main__':
         train()
         if step % METRIC_REPORT_FREQUENCY == 0:
             print_metrics(step)
+        if step % SAVE_FREQUENCY == 0:
+            save_state()
         self_play()

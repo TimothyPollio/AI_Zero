@@ -32,15 +32,15 @@ class Record():
         self.hst = self.hst[nrows:]
         return self
 
-    def save(self, dir):
-        np.savez(dir + "/record.npz",
+    def save(self, file_name):
+        np.savez(file_name,
                  pos  = self.pos,
                  val  = self.val,
                  pol  = self.pol,
                  hst  = self.hst)
 
-def load_record(dir):
-    npz = np.load(dir + "/record.npz")
+def load_record(file_name):
+    npz = np.load(file_name)
     return Record(npz['pos'], npz['val'], npz['pol'], list(npz['hst']))
 
 def combine_records(record1, record2):

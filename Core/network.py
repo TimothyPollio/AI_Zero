@@ -1,11 +1,11 @@
 import os
 import numpy as np
 import tensorflow as tf
-from tensorflow.python.framework.errors_impl import InvalidArgumentError
+from tensorflow.python.framework.errors_impl import InvalidArgumentError, NotFoundError
 
 from Game import FLAT_BOARD_SHAPE, TRUE_BOARD_SHAPE, POLICY_SIZE
 from constants import (ALPHA, NUM_FILTERS, FILTER_SIZE, NUM_RES_BLOCKS,
-                      HIDDEN_SIZE, VERSION_NAME, LEARNING_RATE)
+                       HIDDEN_SIZE, VERSION_NAME, LEARNING_RATE)
 
 sess = tf.Session()
 
@@ -67,30 +67,30 @@ update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
 with tf.control_dependencies(update_ops):
     train = tf.train.AdamOptimizer(LEARNING_RATE).minimize(loss)
 
+print("Initializing...")
 sess.run(tf.global_variables_initializer())
 
 ### Saving & Loading
 saver = tf.train.Saver()
 
-def save_model(session = sess, msg = "model saved", loc = None):
+def file_path(file_name = "ckpt", loc = None):
     if not loc:
         loc = "./Models/" + VERSION_NAME
     if not os.path.exists(loc):
         os.makedirs(loc)
-    loc = loc + "/ckpt"
-    saver.save(session, loc)
+    return loc + "/" + file_name
+
+def save_model(session = sess, msg = "model saved", loc = None):
+    saver.save(session, file_path(loc = loc))
     if msg:
         print(msg)
 
 def load_model(session = sess, msg = "model restored", loc = None):
-    if not loc:
-        loc = "./Models/" + VERSION_NAME
-    loc = loc + "/ckpt"
     try:
-        saver.restore(session, loc)
+        saver.restore(session, file_path(loc = loc))
         if msg:
             print(msg)
-    except InvalidArgumentError:
-        print("Warning: Failed to load old model (Network topology may have changed)")
+    except (InvalidArgumentError, NotFoundError):
+        print("Warning: Failed to load old model")
         print("Running global variables initializer")
         session.run(tf.global_variables_initializer())

@@ -1,4 +1,5 @@
 import numpy as np
+from Game.symmetry import Rotation, Reflection
 
 EMPTY_BOARD      = np.zeros((2,9))
 FLAT_BOARD_SHAPE = [2,9]
@@ -35,6 +36,11 @@ def board_after(board, move, player=None):
     out = board.copy()
     out[player][move] = 1
     return out
+
+# Symmetries
+tau = Rotation(3)
+sigma = Reflection(3,3)
+SYMMETRIES = [sigma ** n for n in range(1,4)] + [tau * sigma ** n for n in range(0,4)]
 
 # Externally generated test set (for diagnostic only)
 TEST_POSITIONS = np.load("./Game/tic_reference/positions").reshape(-1,2,9)

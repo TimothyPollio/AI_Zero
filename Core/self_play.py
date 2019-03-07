@@ -5,7 +5,7 @@ from constants import (RECORD_HISTORY, CULL_THRESHOLD, GAMES_PER_CYCLE,
                        VERBOSE_MCTS, STEPS_PER_MOVE, NOISE_TYPE, NOISE_VALUE)
 from Core.record import Record, combine_records
 from Core.tree import Tree
-from Game import board_after, direct_evaluate, is_done, EMPTY_BOARD
+from Game import board_after, direct_evaluate, is_done, EMPTY_BOARD, SYMMETRIES
 
 class Game():
 
@@ -105,5 +105,9 @@ class MultipleSelfPlay():
             for tree, value, policy in zip(trees, values, policies):
                 tree.expand_and_update(value, policy)
 
-    def record(self):
-        return reduce(combine_records, (game.record for game in self.games))
+    def record(self, use_symmetry = True):
+        rec = reduce(combine_records, (game.record for game in self.games))
+        if use_symmetry:
+            augmented_rec = [rec] + [s * rec for s in SYMMETRIES]
+            return reduce(combine_records, augmented_rec)
+        return rec

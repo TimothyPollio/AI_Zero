@@ -23,7 +23,7 @@ EPSILON                 = 10 ** -6   # Small constant to avoid division by 0
 VERBOSE_MCTS            = True
 
 ### Record
-MAX_RECORD_SIZE = 20 * 256
+MAX_RECORD_SIZE = 200 * 256
 MIN_RECORD_SIZE = 0 * 256
 CULL_THRESHOLD  = 2  # Positions with very low depth are omitted from record
 RECORD_HISTORY  = True
@@ -37,4 +37,4 @@ MAX_EPOCHS_PER_CYCLE    = 1
 VERBOSE_TRAINING        = True
 METRIC_REPORT_FREQUENCY = 1
 SAVE_FREQUENCY          = 30
-REFERENCE_AVAILABLE     = False
+REFERENCE_AVAILABLE     = True

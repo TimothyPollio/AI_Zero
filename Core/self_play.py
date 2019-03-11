@@ -54,10 +54,9 @@ class MultipleSelfPlay():
             self.players = [players, players]
             self.reuse_trees = True
 
-        self.number_of_games = number_of_games
         self.tournament = False
         self.moves_played = 0
-        self.games = [Game(EMPTY_BOARD) for _ in range(self.number_of_games)]
+        self.games = [Game(EMPTY_BOARD) for _ in range(number_of_games)]
         self.active_games = self.games
 
     def play(self):

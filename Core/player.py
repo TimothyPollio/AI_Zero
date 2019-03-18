@@ -6,6 +6,8 @@ from Core.network import (sess, train, value, policy, loss, policy_loss, value_l
                          value_accuracy, load_model, board_positions,
                          policy_labels, value_labels, training)
 
+from Game import board_after, is_won, legal_moves
+
 class NetworkPlayer():
 
     def __init__(self, session = sess):
@@ -42,3 +44,32 @@ class NetworkPlayer():
 
     def get_move(self, game):
         return game.tree.choose_move(self.temperature)
+
+class BackupNetPlayer(NetworkPlayer):
+
+    def __init__(self, loc = None):
+        self.session = tf.Session()
+        load_model(self.session, msg = None, loc = loc)
+        self.use_mcts = True
+
+class ReferencePlayer():
+    '''
+    Weak player that relies on a shallow brute force search
+    '''
+    def __init__(self):
+        self.use_mcts = False
+
+    def get_move(self, game):
+        board = game.position
+        # Check for one move wins
+        for m in legal_moves(board):
+            if is_won(board_after(board, m)):
+                return m, []
+        # Otherwise take any move that doesn't lose immediately
+        for m1 in legal_moves(board):
+            board1 = board_after(board, m1)
+            responses = legal_moves(board1)
+            if not any(is_won(board_after(board1, m2)) for m2 in responses):
+                return m1, []
+        # Otherwise just play
+        return legal_moves(board)[0], []

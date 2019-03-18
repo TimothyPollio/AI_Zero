@@ -5,7 +5,7 @@ from constants import (RECORD_HISTORY, CULL_THRESHOLD, GAMES_PER_CYCLE,
                        VERBOSE_MCTS, STEPS_PER_MOVE, NOISE_TYPE, NOISE_VALUE)
 from Core.record import Record, combine_records
 from Core.tree import Tree
-from Game import board_after, direct_evaluate, is_done, EMPTY_BOARD, SYMMETRIES
+from Game import board_after, direct_evaluate, get_children, is_done, EMPTY_BOARD, SYMMETRIES
 
 class Game():
 
@@ -110,3 +110,29 @@ class MultipleSelfPlay():
             augmented_rec = [rec] + [s * rec for s in SYMMETRIES]
             return reduce(combine_records, augmented_rec)
         return rec
+
+    def score(self):
+        player1_wins = len([game for game in self.games if game.winner == 1])
+        player1_losses = len([game for game in self.games if game.winner == -1])
+        ties = len(self.games) - player1_wins - player1_losses
+        score = (player1_wins - player1_losses) / len(self.games)
+        print("Win-Tie-Loss:", player1_wins, "-", ties, "-", player1_losses)
+        return score
+
+class Tournament(MultipleSelfPlay):
+
+    def __init__(self, players):
+        self.tournament = True
+        self.players = players
+        self.reuse_trees = False
+        self.moves_played = 2
+        self.games = [Game(position) for child in get_children(EMPTY_BOARD)\
+                                     for position in get_children(child)]
+        self.active_games = self.games
+
+def compare_players(players):
+    score1 = Tournament(players).play().score()
+    score2 = Tournament(players[::-1]).play().score()
+    score = (score1 - score2) / 2
+    print("Score:", score)
+    return score

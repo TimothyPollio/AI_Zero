@@ -4,9 +4,9 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 from constants import *
 from Core.network import file_path, save_model, load_model
-from Core.player import NetworkPlayer
+from Core.player import NetworkPlayer, BackupNetPlayer, ReferencePlayer
 from Core.record import combine_records, load_record
-from Core.self_play import MultipleSelfPlay
+from Core.self_play import MultipleSelfPlay, compare_players
 
 if REFERENCE_AVAILABLE:
     from Game import TEST_POSITIONS, TEST_VALUES, POLICY_SIZE
@@ -62,5 +62,9 @@ if __name__ == '__main__':
         if step % METRIC_REPORT_FREQUENCY == 0:
             print_metrics(step)
         if step % SAVE_FREQUENCY == 0:
+            print("Tournament vs Previous Version:")
+            compare_players([player, BackupNetPlayer()])
+            print("Tournament vs ReferencePlayer")
+            compare_players([player, ReferencePlayer()])
             save_state()
         self_play()

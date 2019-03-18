@@ -20,9 +20,6 @@ def direct_evaluate(board):
         return 0
     return "NOT DONE"
 
-def is_done(board):
-    return direct_evaluate(board) != "NOT DONE"
-
 def legal_moves(board):
     taken = board.sum(axis=0)
     return [i for i in range(9) if not taken[i]]

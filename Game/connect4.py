@@ -39,9 +39,6 @@ def direct_evaluate(board):
         return 0
     return "NOT DONE"
 
-def is_done(board):
-    return direct_evaluate(board) != "NOT DONE"
-
 def legal_moves(board):
     sum_ = board.sum(axis=0).reshape(6,7).sum(axis=0)
     cols = [i for i in range(7) if sum_[i]<6]

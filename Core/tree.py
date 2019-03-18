@@ -10,7 +10,7 @@ class Tree():
         self.parent   = parent
         self.move     = move   # Most recent move (if not root)
         self.parity   = parity # 1 if Player 1 has the move, else -1
-        self.Q        = Q
+        self.Q        = Q      # Note: Correct initial value is 0, not parent.Q
         self.P        = P
         self.U        = EXPLORATION_CONSTANT * P
         self.N        = 0
@@ -50,7 +50,6 @@ class Tree():
             policy = policy / (sum(policy[i] for i in legal_moves(node.position)) + EPSILON)
             to_play = 0 if node.parity == 1 else 1
             node.children = [Tree(position = board_after(node.position, m, to_play),
-                                  Q = node.Q,
                                   P = policy[m],
                                   parity = node.parity * -1,
                                   parent = node,

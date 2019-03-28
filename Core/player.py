@@ -1,12 +1,13 @@
 import tensorflow as tf
 
-from constants import (EXPLORATION_TEMPERATURE, FINAL_TEMPERATURE,
+from constants import (EXPLORATION_TEMPERATURE, FINAL_TEMPERATURE, STEPS_PER_MOVE,
                        EXPLORATION_THRESHOLD, RANDOM_THRESHOLD)
 from Core.network import (sess, train, value, policy, loss, policy_loss, value_loss,
                          value_accuracy, load_model, board_positions,
                          policy_labels, value_labels, training)
+from Core.tree import Tree
 
-from Game import board_after, is_won, legal_moves
+from Game import board_after, is_won, legal_moves, board_from_string
 
 class NetworkPlayer():
 
@@ -44,6 +45,17 @@ class NetworkPlayer():
 
     def get_move(self, game):
         return game.tree.choose_move(self.temperature)
+
+    def analyze(self, game_history, steps = STEPS_PER_MOVE):
+        board = board_from_string(game_history)
+        parity = -1 if len(game_history.split("-")) % 2 else 1
+        if game_history in ["START", "", None]:
+            parity = 1
+        tree = Tree(board, parity = parity)
+        for _ in range(steps):
+            values, policies = self.predict([tree.get_next()])
+            tree.expand_and_update(values[0], policies[0])
+        return tree
 
 class BackupNetPlayer(NetworkPlayer):
 

@@ -58,5 +58,14 @@ def board_after(board, move, player = None):
             out[player][y + move] = 1
             return out
 
+def board_from_string(game_history):
+    if game_history in ["START", "", None]:
+        return EMPTY_BOARD
+    move_list = game_history.split("-")
+    board = EMPTY_BOARD.copy()
+    for n, move in enumerate(move_list):
+        board[n % 2][int(move)] = 1
+    return board
+
 # Symmetries
 SYMMETRIES = [Reflection(6, 7)]

@@ -12,6 +12,9 @@ sess = tf.Session()
 
 board_positions = tf.placeholder(tf.float32, shape = [None] + FLAT_BOARD_SHAPE)
 board_reshaped  = tf.reshape(board_positions, [-1] + TRUE_BOARD_SHAPE)
+to_move         = tf.mod(tf.reduce_sum(board_positions, [1,2]), 2)
+to_move_plane   = tf.reshape(to_move, (([-1, 1, 1, 1]))) * tf.ones([1] + TRUE_BOARD_SHAPE[1:])
+full_input      = tf.concat((board_reshaped, to_move_plane), axis=1)
 
 value_labels    = tf.placeholder(tf.float32, shape = [None, 1])
 policy_labels   = tf.placeholder(tf.float32, shape = [None, POLICY_SIZE])
@@ -28,7 +31,7 @@ def conv_block(z, num_filters = NUM_FILTERS,
     return w
 
 ### Convolutional Block
-x = conv_block(board_reshaped)
+x = conv_block(full_input)
 
 ### Residual Blocks
 for _ in range(NUM_RES_BLOCKS):

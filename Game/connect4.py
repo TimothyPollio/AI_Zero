@@ -42,7 +42,11 @@ def direct_evaluate(board):
 def legal_moves(board):
     sum_ = board.sum(axis=0).reshape(6,7).sum(axis=0)
     cols = [i for i in range(7) if sum_[i]<6]
-    return [int(35 + c - 7 * sum_[c]) for c in cols]
+    moves = [int(35 + c - 7 * sum_[c]) for c in cols]
+    for move in moves:
+        if direct_evaluate(board_after(board, move)) != "NOT DONE":
+            return [move]
+    return moves
 
 def get_turn(board):
     return int(board.sum()) % 2

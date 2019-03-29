@@ -97,13 +97,19 @@ function click(i){
   }
 }
 
-function AIplay() {
+function game_history() {
   if (moveData.length > 0) {
-    game_history = moveData.join("-");
-  } else {
-    game_history = "START";
+    return moveData.join("-")
   }
-  $.get('/get_move/' + game_history, move => click(Number(move)))
+  return "START"
+}
+
+function AIplay() {
+  $.get('/get_move/' + game_history(), move => click(Number(move)))
+}
+
+function showTree() {
+  window.open("/tree/" + game_history())
 }
 
 render();

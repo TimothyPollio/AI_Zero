@@ -27,5 +27,10 @@ def choose_move(game_history):
     move, _ = tree.choose_move(temperature = 0)
     return str(move)
 
+@app.route('/tree/<game_history>')
+def make_tree(game_history):
+    tree = player.analyze(game_history)
+    return render_template('tree.html', tree_data = tree.json(game_history))
+
 if __name__ == "__main__":
     app.run()

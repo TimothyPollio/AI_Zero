@@ -1,6 +1,6 @@
 import numpy as np
 
-from constants import EXPLORATION_CONSTANT, EPSILON
+from constants import EXPLORATION_CONSTANT, EPSILON, RECORD_MCTS
 from Game import is_done, direct_evaluate, legal_moves, board_after, POLICY_SIZE
 
 class Tree():
@@ -54,6 +54,18 @@ class Tree():
                                   parity = node.parity * -1,
                                   parent = node,
                                   move = m) for m in legal_moves(node.position)]
+
+        ### Record
+        if RECORD_MCTS:
+            node.originalQ = round(value[0], 2)
+            node.originalP = {m: round(policy[m], 2) for m in legal_moves(node.position)}
+            if node.parent:
+                node.parentID = node.parent.ID
+                node.ID = node.parentID + "-" + str(node.move)
+            else:
+                node.parentID = "None"
+                node.ID = ""
+
         ### Update
         new_Q = node.Q
         while self.stack:
@@ -84,6 +96,35 @@ class Tree():
             move = np.random.choice(POLICY_SIZE, p = policy_vector)
 
         return move, policy_vector
+
+    def dict(self, game_history):
+        self.Q = round(self.Q, 2)
+        self.U = round(self.U, 2)
+        if game_history in ["START", "", None]:
+            self.ID = self.ID[1:]
+            self.parentID = self.parentID[1:]
+        else:
+            self.ID = game_history + self.ID
+            self.parentID = game_history + self.parentID
+        if "one" in self.parentID:
+            self.parentID, self.P, self.U = "None", "N/A", "N/A"
+        keys = ['ID', 'parentID', 'N', 'Q', 'P', 'V', 'U']
+        return {key: str(getattr(self, key)) for key in keys}
+
+    def json(self, game_history):
+        explored, active = [], [self]
+        while active:
+            node = active.pop()
+            node.V = node.originalQ
+            try:
+                for child in node.children:
+                    if child.N > 0:
+                        child.P = node.originalP[child.move]
+                        active.append(child)
+            except AttributeError:
+                pass
+            explored.append(node)
+        return str([node.dict(game_history) for node in explored])
 
     def get_child(self, m):
         '''

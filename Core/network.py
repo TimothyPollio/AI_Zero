@@ -1,4 +1,5 @@
 import os
+import __main__
 import numpy as np
 import tensorflow as tf
 from tensorflow.python.framework.errors_impl import InvalidArgumentError, NotFoundError
@@ -91,6 +92,8 @@ def load_model(session = sess, msg = "model restored", loc = None):
         if msg:
             print(msg)
     except (InvalidArgumentError, NotFoundError):
+        if __main__.__file__ == 'server.py':
+            raise Exception("Model failed to load. This is fatal in server mode.")
         print("Warning: Failed to load old model")
         print("Running global variables initializer")
         session.run(tf.global_variables_initializer())

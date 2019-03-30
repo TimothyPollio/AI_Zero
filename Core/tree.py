@@ -113,6 +113,10 @@ class Tree():
     def dict(self, game_history):
         self.Q = round(self.Q, 2)
         self.U = round(self.U, 2)
+        if self.U > 2:
+            self.U = "(+)"
+        elif self.U < -2:
+            self.U = "(-)"
         if game_history in ["START", "", None]:
             self.ID = self.ID[1:]
             self.parentID = self.parentID[1:]

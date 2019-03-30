@@ -1,6 +1,6 @@
 function format(string) {
   if (string[0] == "-") {
-    return string.slice(0, -1)
+    return string
   }
   return " " + string
 }

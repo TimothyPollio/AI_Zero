@@ -1,7 +1,7 @@
 # AI_Zero
 
-The goal of this project is to implement a version of DeepMind's AlphaZero algorithm. 
+An implementation of DeepMind's AlphaZero algorithm using TensorFlow. Includes game server and interactive visualizations for the game Connect 4 built with Flask and D3.js.
 
-The initial version only supports training for Tic-Tac-Toe, but it learns the game in a few minutes.
+![](https://github.com/TimothyPollio/AI_Zero/blob/master/src/images/game_example.png)
 
-Other features and support for other games are forthcoming. I believe that there is value in interpretability, so one of my priorities will be the visualization of game records and search trees.
+![](https://github.com/TimothyPollio/AI_Zero/blob/master/src/images/tree_example.png)

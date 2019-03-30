@@ -141,7 +141,7 @@ class Tree():
             except AttributeError:
                 pass
             explored.append(node)
-        return str([node.dict(game_history) for node in explored])
+        return str([node.dict(game_history) for node in explored[::-1]])
 
     def get_child(self, m):
         '''

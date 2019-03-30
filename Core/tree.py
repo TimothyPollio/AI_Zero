@@ -1,6 +1,6 @@
 import numpy as np
 
-from constants import EXPLORATION_CONSTANT, EPSILON, RECORD_MCTS
+from constants import EXPLORATION_CONSTANT, EPSILON, RECORD_MCTS, NOISE_TYPE, NOISE_VALUE
 from Game import is_done, direct_evaluate, legal_moves, board_after, POLICY_SIZE
 
 class Tree():
@@ -25,10 +25,23 @@ class Tree():
         self.stack = [self]
         node = self
         while node.N and not is_done(node.position):
+            if (node.N == 1 and node.parent is None) or (node.parent and (node.N == 15 and node.parent.parent is None)):
+                node.encourage_exploration()
             node = max(node.children, key = lambda child: node.parity * child.Q\
                                                         + child.U * node.sN)
             self.stack.append(node)
         return node.position
+
+    def encourage_exploration(self):
+        '''
+        The AlphaZero algorithm adds Dirichlet noise at the tree root to encourage exploration.
+        Here we add a uniform prior instead as a hedge since the number of available moves is
+        always small. This makes the search more robust when the model is relatively untrained.
+        '''
+        if NOISE_TYPE == "constant":
+            for child in self.children:
+                child.P += NOISE_VALUE
+                child.U = EXPLORATION_CONSTANT * child.P / (child.N + 1.)
 
     def expand_and_update(self, value, policy):
         '''

@@ -24,7 +24,7 @@ VERBOSE_MCTS            = True
 
 ### Record
 MAX_RECORD_SIZE = 100000
-MIN_RECORD_SIZE = 30000
+MIN_RECORD_SIZE = 50000
 CULL_THRESHOLD  = 4  # Positions with very low depth are omitted from record
 RECORD_HISTORY  = False
 RECORD_MCTS     = True
@@ -33,9 +33,9 @@ RECORD_MCTS     = True
 ALPHA                   = 0.0001
 LEARNING_RATE           = 0.005
 BATCH_SIZE              = 256
-BATCHES_PER_CYCLE       = 40
+BATCHES_PER_CYCLE       = 30
 MAX_EPOCHS_PER_CYCLE    = 1
 VERBOSE_TRAINING        = False
 METRIC_REPORT_FREQUENCY = 1
-SAVE_FREQUENCY          = 25
+SAVE_FREQUENCY          = 20
 REFERENCE_AVAILABLE     = False

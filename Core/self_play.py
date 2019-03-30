@@ -89,17 +89,10 @@ class MultipleSelfPlay():
                 game.tree = Tree(game.position, parity = parity)
 
     def mcts(self, player):
+        trees = [game.tree for game in self.active_games]
         for _ in range(STEPS_PER_MOVE):
-            trees = [game.tree for game in self.active_games if game.tree.N < STEPS_PER_MOVE]
-            if not trees:
-                break
             eval_buffer = [tree.get_next() for tree in trees]
             values, policies = player.predict(eval_buffer)
-
-            # We often reuse subtrees, so it's not practical to add noise only at the roots.
-            # For the sake of exploration, we add a minimum prior for all moves.
-            if NOISE_TYPE == "constant":
-                policies += NOISE_VALUE
 
             for tree, value, policy in zip(trees, values, policies):
                 tree.expand_and_update(value, policy)

@@ -68,28 +68,59 @@ function render() {
       .data(fortyTwo)
       .enter()
       .append("rect")
-      .attr("x", (d,i) => (i % 7) * squareSize)
-      .attr("y", (d,i) => ~~(i/7) * squareSize)
+      .attr("x", (_,i) => (i % 7) * squareSize)
+      .attr("y", (_,i) => ~~(i/7) * squareSize)
       .attr("width", squareSize)
       .attr("height", squareSize)
       .attr("fill", "transparent")
       .attr("stroke", "black")
       .attr("stroke-width", 0.6)
+      .attr("id", (_,i) => "B" + d.data.ID + "S" + String(i))
 
-    // Pieces
     if (d.data.ID.length > 0){
+      // Pieces
       d3.select('#BOARD' + d.data.ID)
         .selectAll('.piece')
         .data(d.data.ID.split("-"))
         .enter()
         .append("text")
         .attr("class", "piece")
-        .attr("x", d => ((d % 7) + 0.25) * squareSize)
-        .attr("y", d => (~~(d / 7) + .75) * squareSize)
+        .attr("x", m => ((m % 7) + 0.25) * squareSize)
+        .attr("y", m => (~~(m / 7) + .75) * squareSize)
         .text(letter)
         .attr("stroke", color)
         .attr("stroke-width", 0.06 * squareSize)
         .attr("font-size", 0.8 * squareSize)
+
+      // Highlight latest move
+      d3.select('#B' + d.data.ID + "S" + String(d.data.ID.split("-").slice(-1)[0]))
+        .attr('fill', '#ffff65')
+    }
+
+    // Highlight X wins
+    if (d.data.Q.slice(0,1) == "1") {
+      Xs = d.data.ID.split("-").filter((_,i) => (i+1) % 2)
+      for (quad of winners) {
+        if (quad.map(v => Xs.includes(String(v))).every(x => x)) {
+          for (v of quad) {
+            d3.select('#B' + d.data.ID + "S" + String(v))
+              .attr('fill', '#f98b8b')
+          }
+        }
+      }
+    }
+
+    // Highlight O wins
+    if (d.data.Q.slice(0,2) == "-1") {
+      Os = d.data.ID.split("-").filter((_,i) => i % 2)
+      for (quad of winners) {
+        if (quad.map(v => Os.includes(String(v))).every(x => x)) {
+          for (v of quad) {
+            d3.select('#B' + d.data.ID + "S" + String(v))
+              .attr('fill', '#93a0ed')
+          }
+        }
+      }
     }
   }
 
